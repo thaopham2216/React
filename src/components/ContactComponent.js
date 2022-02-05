@@ -174,6 +174,9 @@ class Contact extends Component {
                             </Row>
                             <Row className="form-group">
                                 <Col md={{size: 4, offset: 2}}>
+                                {/* 
+                                <div class="col-md-4 offset-md-2"> at 7.01 mins controlled form?????
+                                */}
                                     <div className="form-check">
                                         <Label check>
                                             <Control.checkbox
@@ -204,6 +207,9 @@ class Contact extends Component {
                             </Row>
                             <Row className="form-group">
                                 <Col md={{size: 10, offset: 2}}>
+                                  {/* 
+                                <div class="col-md-10 offset-md-2"> at 7.01 mins controlled form?????
+                                */}
                                     <Button type="submit" color="primary">
                                         Send Feedback
                                     </Button>
