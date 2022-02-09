@@ -3,10 +3,13 @@ import { Card, CardImg, CardText, CardBody, Breadcrumb, BreadcrumbItem, Button, 
 ModalHeader, ModalBody, Label} from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
-
+import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 const required = val => val && val.length;
 const maxLength = len => val => !val || (val.length <= len);
+const minLength = len => val => val && (val.length >= len);
 /* another way to write maxLength above
 function maxLength(len){
     return function (val) {
@@ -15,42 +18,43 @@ function maxLength(len){
     }
 }
 */
-const minLength = len => val => val && (val.length >= len);
 
 function RenderCampsite({campsite}) { 
     return(
         <div className='col-md-5 m-1'>
-            <Card>
-                <CardImg top src={campsite.image} alt={campsite.name} />
-                <CardBody>
-                    <CardText>{campsite.description}</CardText>
-                </CardBody>
-            </Card>
-
+            <FadeTransform
+                in
+                transformProps={{
+                    exitTransform: 'scale(0.5) translateY(-50%)'
+                }}>
+                <Card>
+                    <CardImg top src={baseUrl + campsite.image} alt={campsite.name} />
+                    <CardBody>
+                        <CardText>{campsite.description}</CardText>
+                    </CardBody>
+                </Card>
+            </FadeTransform>  
         </div>
         );
 }
-function RenderComments({comments}) {
+function RenderComments({comments, postComment, campsiteId}) {
     if(comments) {
         return(
-            /*
             <div className="col-md-5 m-1">
                 <h4>Comments</h4>
-                {comments.map(comments =><div key={comments.id}>{comments.text} <br />
-                --{comments.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comments.date)))}</div>) }
-            </div
-            */
-            <div className="col-md-5 m-1">
-                <h4>Comments</h4>
-                {comments.map(comments=> {
-                    return(
-                        <div key={comments.id}>
-                            <p>{comments.text}<br />
-                            -- {comments.author},  {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comments.date)))}</p>
-                        </div>
-                    );
-                })}
-                <CommentForm />
+                <Stagger in>
+                    {comments.map(comments=> {
+                        return(
+                            <Fade in key={comments.id}>
+                                <div>
+                                    <p>{comments.text}<br />
+                                    -- {comments.author},  {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comments.date)))}</p>
+                                </div>
+                            </Fade>
+                        );
+                    })}
+                </Stagger>
+                <CommentForm campsiteId={campsiteId} postComment={postComment}/>
 
             </div>
 
@@ -59,6 +63,26 @@ function RenderComments({comments}) {
     return <div />  
 }
 function CampsiteInfo(props) {
+    if (props.isLoading){
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+    }
+    if (props.errMess){
+        return(
+            <div className='container'>
+                <div className='row'>
+                    <div className='col'>
+                        <h4>{props.errMess}</h4>
+                    </div>
+                </div>
+            </div>
+        );
+    }
     if (props.campsite) {
         return(
             // the lecture week3 at the end of exercise1: presentation and container component , but if put the container div here, it mess things up 
@@ -72,10 +96,14 @@ function CampsiteInfo(props) {
                         <h2>{props.campsite.name}</h2>
                         <hr />
                     </div>
-            </div>
+                </div>
                 <div className = "row">
                     <RenderCampsite campsite={props.campsite} />
-                    <RenderComments comments={props.comments} />
+                    <RenderComments 
+                        comments={props.comments} 
+                        postComment={props.postComment}
+                        campsiteId={props.campsite.id}
+                    />
                 </div>
             </div> 
     );
@@ -94,8 +122,8 @@ class CommentForm extends Component{
         });
     };
     handleSubmit = (values) => {
-        console.log("Current state is: " + JSON.stringify(values));
-        alert("Current state is: " + JSON.stringify(values));
+        this.toggleModal();
+        this.props.postComment(this.props.campsiteId, values.rating, values.author, values.text);
     };
 
     /*
