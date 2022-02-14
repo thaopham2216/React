@@ -3,6 +3,7 @@ import { Breadcrumb, BreadcrumbItem,
     Button, Label, Col, Row } from 'reactstrap';  
 import { Link } from 'react-router-dom';
 import { Control, Form, Errors } from 'react-redux-form';
+import { postFeedback } from '../redux/ActionCreators';
 
 const required = val => val && val.length;
 const maxLength = len => val => !val || (val.length <= len);
@@ -33,9 +34,14 @@ class Contact extends Component {
 
 
     handleSubmit(values) {
+        this.props.postFeedback(values);
+        this.props.resetFeedbackForm();
+        /*
         console.log("Current state is: " + JSON.stringify(values));
         alert("Current state is: " + JSON.stringify(values));
         this.props.resetFeedbackForm();
+        */
+    
     }
 
     render() {
@@ -211,7 +217,7 @@ class Contact extends Component {
                                   {/* 
                                 <div class="col-md-10 offset-md-2"> at 7.01 mins controlled form?????
                                 */}
-                                    <Button type="submit" color="primary">
+                                    <Button  whileHover={{ scale: 1.3}} type="submit" color="primary">
                                         Send Feedback
                                     </Button>
                                 </Col>

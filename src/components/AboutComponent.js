@@ -1,12 +1,64 @@
 import React from 'react';
 import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardHeader, Media } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { baseUrl } from '../shared/baseUrl';
+import { Fade, Stagger } from 'react-animation-components';
+
+// new
+import { Loading } from './LoadingComponent';
+
+
+function PartnerList(props){
+    const partners = props.partners.partners.map(partner => {
+        return (
+            <Media tag="li" key={partner.id}>
+                <RenderPartner partner={partner} />
+            </Media>
+            
+        );
+    });
+    if (props.partners.isLoading){
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+    }
+    if (props.partners.errMess){
+        return(
+            <div className='container'>
+                <div className='row'>
+                    <div className='col'>
+                        <h4>{props.partners.errMess}</h4>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    return (
+        <div>
+            <Fade in key={partners.id}>
+                <Media list>
+
+                    <Stagger in>{partners}</Stagger>
+                </Media>
+            </Fade>
+
+        </div>
+        
+        
+    )
+
+}
+//new
 
 function RenderPartner({partner}){
     if (partner) {
         return (
             <React.Fragment>
-                <Media object src={partner.image} alt={partner.name} width ='150' />
+                <Media object src={baseUrl + partner.image} alt={partner.name} width ='150' />
                 <Media body className="ml-5 mb-4">
                     <Media heading>
                         {partner.name}
@@ -22,14 +74,6 @@ function RenderPartner({partner}){
 }
 
 function About(props) {
-
-    const partners = props.partners.map(partner => {
-        return (
-            <Media tag="li" key={partner.id}>
-                <RenderPartner partner={partner} />
-            </Media>
-        );
-    });
 
     return (
         <div className="container">
@@ -73,7 +117,7 @@ function About(props) {
                                 <footer className="blockquote-footer">Muriel Strode,{' '}
                                     <cite title="Source Title">"Wind-Wafted Wild Flowers" -
                                     The Open Court, 1903</cite>
-                                </footer>
+                                </footer>clear
                             </blockquote>
                         </CardBody>
                     </Card>
@@ -83,11 +127,8 @@ function About(props) {
                 <div className="col-12">
                     <h3>Community Partners</h3>
                 </div>
-                <div className="col mt-4">
-                    <Media list>
-                        {partners}
-                    </Media>
-                </div>
+                <PartnerList partners={props.partners} />
+    
             </div>
         </div>
     );
